@@ -1,0 +1,161 @@
+<html>
+    <head>
+        <canvas id="canvas" width="500" height="500"></canvas>
+        <img id="imagemCenario" width="500" height="500" src="cenario01.png" style="display:none; margin:auto;">
+        <img id="imagem" width="30" height="30" src="maca.png" style="display:none">
+        <img id="botao"  src="botao.png" style="display: none" onmousedown="pausarIniciar()">
+
+        
+        <script>
+            var img2 = document.getElementById("botao");
+            var img1 = document.getElementById("imagem");
+            var img = document.getElementById("imagemCenario");
+            var canv = document.getElementById("canvas");
+            var x =null;
+            var y = null;
+            var block=1;
+
+            function reiniciar(){
+            canvas.addEventListener("click", evento =>{
+                if(block){
+                
+                
+                x = evento.clientX - canvas.offsetLeft;
+                y = evento.clientY - canvas.offsetTop;
+                
+                estado=1;
+                if((x >= 160 && x <= 360) &&(y >= 160 && y <= 260)){
+                    cancelAnimationFrame(cancelar);
+                    animacaoComida();
+                }else if(estado){
+                    animacaoComida();
+                }
+            }
+            });
+        } 
+            var contexto = canv.getContext("2d");
+            var personagemPoseInicialX = 250;
+            var personagemPoseInicialY = 378;
+            var personagemTamanhoX = 30;
+            var personagemTamanhoY = 30;
+            var estado =1;
+            var spaceBlock=0;
+            var objComida = 0;
+            var comidaX=0;
+            var comidaY =0;
+            var cancelar;
+            var vidas =3;
+            var pontos=0;
+           
+            
+            function apagarFundo(){
+                comidaX =0;
+                comidaY =0;
+                contexto.drawImage(img,0,0);
+                contexto.fillStyle = "black";
+                contexto.fillRect(personagemPoseInicialX,personagemPoseInicialY,personagemTamanhoX, personagemTamanhoY);
+                comidaX = Math.floor(Math.random()* 46)+1;
+                comidaX = comidaX *10;
+                contexto.drawImage(img1,comidaX,comidaY,30,30); 
+            }
+            function animacaoComida(){
+                contexto.drawImage(img,0,0);
+                contexto.fillStyle = "black";
+                contexto.fillRect(personagemPoseInicialX,personagemPoseInicialY,personagemTamanhoX, personagemTamanhoY);
+                contexto.drawImage(img1,comidaX,comidaY,30,30);
+                contexto.font = "20px Georgia";
+                contexto.fillText("Vidas: " +vidas,10,20);
+                contexto.fillText("Pontos: "+pontos,10,45);
+                comidaY+=3;
+                
+                if((comidaX >= personagemPoseInicialX-25 && comidaX <= personagemPoseInicialX+25) && (comidaY >= personagemPoseInicialY-25 && comidaY <= personagemPoseInicialY+25) ){
+                    
+                    apagarFundo();
+                    pontos+=10;
+                }
+                if(comidaY>canvas.height){
+                    apagarFundo();
+                    vidas--;
+                    
+                    if(vidas<1){
+                        
+                        estado =0;
+                        vidas=3;
+                        pontos=0;
+                        apagarFundo();
+                      
+                        gameover();  
+                        reiniciar();
+                   }
+                }
+                console.log(estado);
+                if(estado){
+                    cancelar = requestAnimationFrame(animacaoComida);
+                }else{
+                    pausarIniciar();  
+                }
+            }
+            function gameover(){
+                contexto.font = "20px Georgia";
+
+                contexto.fillText("Aperte espaço parar Pausar",250,20);
+                contexto.drawImage(img2,160,160,200,100);
+            }
+            function jogo(){
+                
+                document.addEventListener("keydown",  (evento) => {
+                    if(evento.keyCode === 37){
+                        if(!spaceBlock){
+                        personagemPoseInicialX -=10;   
+                        }             
+                    }
+                    if(evento.keyCode === 39){
+                        if(!spaceBlock){
+                        personagemPoseInicialX +=10; 
+                        }    
+                    }
+                    if(evento.keyCode === 32){
+                       
+                        if(spaceBlock){
+                            spaceBlock =0;
+                            cancelar = requestAnimationFrame(animacaoComida);
+                            
+                            
+                        }else{
+                            console.log("pausado")
+                            spaceBlock=1;
+                            
+                            cancelAnimationFrame(cancelar);
+                        }
+                        
+                    }
+                });
+            }  
+            function pausarIniciar(){
+                cancelAnimationFrame(cancelar);   
+               
+            }
+            window.onload = function(){
+                apagarFundo();
+                gameover(); 
+                jogo(); 
+                reiniciar();
+            }
+        </script>
+    </head>
+    <body>
+            <style>
+                    canvas{
+                    position:absolute;
+                    top:0;bottom:0;right:0;left:0;
+                    margin:auto;
+                    }   
+                    #div{
+                        align-items: center;
+                        display: flex;
+                        justify-content:center;                      
+                    }
+            </style>
+        
+    </body>
+</html>
